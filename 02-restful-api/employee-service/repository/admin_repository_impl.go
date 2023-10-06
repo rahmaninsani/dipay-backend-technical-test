@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/config"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,10 +28,11 @@ func (repository AdminRepositoryImpl) FindOne(ctx context.Context, admin domain.
 	if err := repository.Client.
 		Database(config.Constant.DBName).
 		Collection("admins").
-		FindOne(ctx, filter).Decode(&admin);
+		FindOne(ctx, filter).
+		Decode(&admin);
 		err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return domain.Admin{}, fmt.Errorf("record not found")
+			return domain.Admin{}, echo.ErrNotFound
 		}
 		return domain.Admin{}, err
 	}

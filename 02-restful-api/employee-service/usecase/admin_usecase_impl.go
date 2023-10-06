@@ -3,13 +3,14 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/labstack/echo/v4"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/config"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/helper"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/domain"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/web"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/repository"
 	"golang.org/x/crypto/bcrypt"
+	"net/http"
 	"time"
 )
 
@@ -31,8 +32,8 @@ func (useCase AdminUseCaseImpl) Login(payload web.AdminLoginRequest) (web.AdminL
 		Username: payload.Username,
 	})
 	if err != nil {
-		if err.Error() == "record not found" {
-			return web.AdminLoginResponse{}, fmt.Errorf("wrong username")
+		if err == echo.ErrNotFound {
+			return web.AdminLoginResponse{}, echo.NewHTTPError(http.StatusConflict, "wrong username")
 		}
 		return web.AdminLoginResponse{}, err
 	}
@@ -40,7 +41,7 @@ func (useCase AdminUseCaseImpl) Login(payload web.AdminLoginRequest) (web.AdminL
 	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(payload.Password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return web.AdminLoginResponse{}, fmt.Errorf("wrong username")
+			return web.AdminLoginResponse{}, echo.NewHTTPError(http.StatusConflict, "wrong username")
 		}
 	}
 	

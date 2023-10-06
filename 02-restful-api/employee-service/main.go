@@ -10,6 +10,7 @@ import (
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/exception"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/handler"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/helper"
+	customMiddleware "github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/middleware"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/repository"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/router"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/usecase"
@@ -46,13 +47,19 @@ func main() {
 	e.Use(middleware.Recover())
 	
 	adminRepository := repository.NewAdminRepository(client)
+	companyRepository := repository.NewCompanyRepository(client)
 	
 	adminUseCase := usecase.NewAdminUseCase(adminRepository)
+	companyUseCase := usecase.NewCompanyUseCase(companyRepository)
 	
 	adminHandler := handler.NewAdminHandler(adminUseCase)
+	companyHandler := handler.NewCompanyHandler(companyUseCase)
+	
+	authMiddleware := customMiddleware.AuthMiddleware(adminRepository)
 	
 	api := e.Group("/api")
 	router.NewAdminRouter(api, adminHandler, nil)
+	router.NewCompanyRouter(api, companyHandler, []echo.MiddlewareFunc{authMiddleware})
 	
 	address := fmt.Sprintf(":%s", config.Constant.AppPort)
 	e.Logger.Fatal(e.Start(address))

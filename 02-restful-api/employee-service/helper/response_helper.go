@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/domain"
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/web"
 	"strconv"
 )
@@ -17,5 +18,11 @@ func ToResponse(code int, data any, message string) web.Response {
 func ToAdminLoginResponse(token string) web.AdminLoginResponse {
 	return web.AdminLoginResponse{
 		Token: token,
+	}
+}
+
+func ToCompanyCreateResponse(company domain.Company) web.CompanyCreateResponse {
+	return web.CompanyCreateResponse{
+		ID: company.ID.Hex(),
 	}
 }

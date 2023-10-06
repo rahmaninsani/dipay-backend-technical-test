@@ -9,18 +9,18 @@ import (
 	"net/http"
 )
 
-type AdminHandlerImpl struct {
-	AdminUseCase usecase.AdminUseCase
+type CompanyHandlerImpl struct {
+	CompanyUseCase usecase.CompanyUseCase
 }
 
-func NewAdminHandler(adminUseCase usecase.AdminUseCase) AdminHandler {
-	return &AdminHandlerImpl{
-		AdminUseCase: adminUseCase,
+func NewCompanyHandler(companyUseCase usecase.CompanyUseCase) CompanyHandler {
+	return &CompanyHandlerImpl{
+		CompanyUseCase: companyUseCase,
 	}
 }
 
-func (handler AdminHandlerImpl) Login(c echo.Context) error {
-	var payload web.AdminLoginRequest
+func (handler CompanyHandlerImpl) Create(c echo.Context) error {
+	var payload web.CompanyCreateRequest
 	if err := c.Bind(&payload); err != nil {
 		return err
 	}
@@ -29,11 +29,11 @@ func (handler AdminHandlerImpl) Login(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	
-	adminLoginResponse, err := handler.AdminUseCase.Login(payload)
+	companyCreateResponse, err := handler.CompanyUseCase.Create(payload)
 	if err != nil {
 		return err
 	}
 	
-	response := helper.ToResponse(http.StatusCreated, adminLoginResponse, "Success")
+	response := helper.ToResponse(http.StatusCreated, companyCreateResponse, "Success")
 	return c.JSON(http.StatusCreated, response)
 }
