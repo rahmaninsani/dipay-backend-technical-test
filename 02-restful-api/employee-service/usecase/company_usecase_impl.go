@@ -54,3 +54,15 @@ func (useCase CompanyUseCaseImpl) Create(payload web.CompanyCreateRequest) (web.
 	
 	return helper.ToCompanyCreateResponse(company), nil
 }
+
+func (useCase CompanyUseCaseImpl) FindAll() ([]web.CompanyResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	
+	companies, err := useCase.CompanyRepository.FindAll(ctx)
+	if err != nil {
+		return []web.CompanyResponse{}, err
+	}
+	
+	return helper.ToCompanyResponses(companies), nil
+}

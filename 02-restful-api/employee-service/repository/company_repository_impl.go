@@ -42,6 +42,23 @@ func (repository CompanyRepositoryImpl) FindOne(ctx context.Context, company dom
 	return company, nil
 }
 
+func (repository CompanyRepositoryImpl) FindAll(ctx context.Context) ([]domain.Company, error) {
+	cursor, err := repository.Client.
+		Database(config.Constant.DBName).
+		Collection("companies").
+		Find(ctx, bson.M{})
+	if err != nil {
+		return []domain.Company{}, err
+	}
+	
+	var companies []domain.Company
+	if err := cursor.All(ctx, &companies); err != nil {
+		return []domain.Company{}, err
+	}
+	
+	return companies, nil
+}
+
 func (repository CompanyRepositoryImpl) Save(ctx context.Context, company domain.Company) (domain.Company, error) {
 	result, err := repository.Client.
 		Database(config.Constant.DBName).

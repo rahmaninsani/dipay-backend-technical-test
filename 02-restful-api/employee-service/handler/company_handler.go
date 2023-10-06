@@ -6,4 +6,5 @@ import (
 
 type CompanyHandler interface {
 	Create(c echo.Context) error
+	FindAll(c echo.Context) error
 }

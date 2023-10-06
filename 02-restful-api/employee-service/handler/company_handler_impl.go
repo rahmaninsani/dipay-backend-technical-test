@@ -37,3 +37,18 @@ func (handler CompanyHandlerImpl) Create(c echo.Context) error {
 	response := helper.ToResponse(http.StatusCreated, companyCreateResponse, "Success")
 	return c.JSON(http.StatusCreated, response)
 }
+
+func (handler CompanyHandlerImpl) FindAll(c echo.Context) error {
+	companyResponses, err := handler.CompanyUseCase.FindAll()
+	if err != nil {
+		return err
+	}
+	
+	modifiedResponse := map[string]any{
+		"count": len(companyResponses),
+		"rows":  companyResponses,
+	}
+	
+	response := helper.ToResponse(http.StatusOK, modifiedResponse, "Success")
+	return c.JSON(http.StatusOK, response)
+}

@@ -4,4 +4,5 @@ import "github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/empl
 
 type CompanyUseCase interface {
 	Create(payload web.CompanyCreateRequest) (web.CompanyCreateResponse, error)
+	FindAll() ([]web.CompanyResponse, error)
 }

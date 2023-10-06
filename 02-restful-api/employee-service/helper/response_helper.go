@@ -26,3 +26,23 @@ func ToCompanyCreateResponse(company domain.Company) web.CompanyCreateResponse {
 		ID: company.ID.Hex(),
 	}
 }
+
+func ToCompanyResponse(company domain.Company) web.CompanyResponse {
+	return web.CompanyResponse{
+		ID:              company.ID.Hex(),
+		CompanyName:     company.CompanyName,
+		TelephoneNumber: company.TelephoneNumber,
+		IsActive:        company.IsActive,
+		Address:         company.Address,
+	}
+}
+
+func ToCompanyResponses(companies []domain.Company) []web.CompanyResponse {
+	var responses []web.CompanyResponse
+	
+	for _, company := range companies {
+		responses = append(responses, ToCompanyResponse(company))
+	}
+	
+	return responses
+}
