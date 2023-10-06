@@ -22,5 +22,5 @@ type Employee struct {
 	Email       string             `bson:"email"`
 	PhoneNumber string             `bson:"phone_number"`
 	JobTitle    JobTitle           `bson:"jobtitle"`
-	CompanyID   primitive.ObjectID `bson:"_id,omitempty"`
+	CompanyID   primitive.ObjectID `bson:"company_id"`
 }
