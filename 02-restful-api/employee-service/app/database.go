@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func NewMongoDB() (*mongo.Client, context.Context, context.CancelFunc) {
+func NewMongoDB() (context.Context, *mongo.Client) {
 	constant := config.Constant
 	
 	var dbUri string
@@ -23,6 +23,7 @@ func NewMongoDB() (*mongo.Client, context.Context, context.CancelFunc) {
 	}
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
 	if err != nil {
@@ -37,16 +38,5 @@ func NewMongoDB() (*mongo.Client, context.Context, context.CancelFunc) {
 	
 	log.Println("🚀 Connected successfully to the database")
 	
-	return client, ctx, cancel
-}
-
-func CloseMongoDB(client *mongo.Client, ctx context.Context, cancel context.CancelFunc) {
-	defer cancel()
-	
-	defer func() {
-		if err := client.Disconnect(ctx); err != nil {
-			log.Println("Failed to disconnect from the database: ", err.Error())
-			panic(err)
-		}
-	}()
+	return ctx, client
 }

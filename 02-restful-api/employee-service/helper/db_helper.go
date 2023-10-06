@@ -6,11 +6,15 @@ import (
 	"github.com/rahmaninsani/dipay-backend-technical-test/02-restful-api/employee-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 	"log"
+	"time"
 )
 
-func InitCollection(client *mongo.Client, ctx context.Context) {
+func InitCollection(client *mongo.Client) {
 	constant := config.Constant
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	
 	adminCollection := client.Database(constant.DBName).Collection("admins")
 	count, err := adminCollection.CountDocuments(ctx, bson.M{})
@@ -24,9 +28,15 @@ func InitCollection(client *mongo.Client, ctx context.Context) {
 		return
 	}
 	
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte("admin"), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println("Failed to generate hashed password: ", err.Error())
+		panic(err)
+	}
+	
 	admin := domain.Admin{
 		Username: "admin",
-		Password: "admin", // TODO: Hash password
+		Password: string(hashedPassword),
 	}
 	
 	_, err = client.Database(constant.DBName).Collection("admins").InsertOne(ctx, admin)
