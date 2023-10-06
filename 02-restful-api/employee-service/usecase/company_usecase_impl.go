@@ -64,5 +64,9 @@ func (useCase CompanyUseCaseImpl) FindAll() ([]web.CompanyResponse, error) {
 		return []web.CompanyResponse{}, err
 	}
 	
+	if len(companies) == 0 {
+		return []web.CompanyResponse{}, echo.NewHTTPError(http.StatusUnprocessableEntity, "Data is not found")
+	}
+	
 	return helper.ToCompanyResponses(companies), nil
 }
