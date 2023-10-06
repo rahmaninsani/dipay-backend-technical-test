@@ -52,3 +52,24 @@ func (handler CompanyHandlerImpl) FindAll(c echo.Context) error {
 	response := helper.ToResponse(http.StatusOK, modifiedResponse, "Success")
 	return c.JSON(http.StatusOK, response)
 }
+
+func (handler CompanyHandlerImpl) SetActive(c echo.Context) error {
+	id := c.Param("id")
+	isActive := true
+	payload := web.CompanyUpdateRequest{
+		ID:       id,
+		IsActive: &isActive,
+	}
+	
+	if err := c.Validate(payload); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	
+	companyUpdateResponse, err := handler.CompanyUseCase.Update(payload)
+	if err != nil {
+		return err
+	}
+	
+	response := helper.ToResponse(http.StatusCreated, companyUpdateResponse, "Success")
+	return c.JSON(http.StatusCreated, response)
+}

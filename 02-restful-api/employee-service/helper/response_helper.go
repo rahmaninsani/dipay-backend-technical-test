@@ -46,3 +46,10 @@ func ToCompanyResponses(companies []domain.Company) []web.CompanyResponse {
 	
 	return responses
 }
+
+func ToCompanyUpdateResponse(company domain.Company) web.CompanyUpdateResponse {
+	return web.CompanyUpdateResponse{
+		ID:       company.ID.Hex(),
+		IsActive: company.IsActive,
+	}
+}

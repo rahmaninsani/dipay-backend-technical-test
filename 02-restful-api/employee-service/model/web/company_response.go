@@ -11,3 +11,8 @@ type CompanyResponse struct {
 	IsActive        bool   `json:"is_active"`
 	Address         string `json:"address"`
 }
+
+type CompanyUpdateResponse struct {
+	ID       string `json:"id"`
+	IsActive bool   `json:"is_active"`
+}

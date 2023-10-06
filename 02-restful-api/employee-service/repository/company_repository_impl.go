@@ -22,8 +22,12 @@ func NewCompanyRepository(client *mongo.Client) CompanyRepository {
 }
 
 func (repository CompanyRepositoryImpl) FindOne(ctx context.Context, company domain.Company) (domain.Company, error) {
-	filter := bson.M{
-		"company_name": company.CompanyName,
+	filter := bson.M{}
+	
+	if company.ID != primitive.NilObjectID {
+		filter["_id"] = company.ID
+	} else {
+		filter["company_name"] = company.CompanyName
 	}
 	
 	if err := repository.Client.
@@ -69,5 +73,42 @@ func (repository CompanyRepositoryImpl) Save(ctx context.Context, company domain
 	}
 	
 	company.ID = result.InsertedID.(primitive.ObjectID)
+	return company, nil
+}
+
+func (repository CompanyRepositoryImpl) Update(ctx context.Context, company domain.Company) (domain.Company, error) {
+	filter := bson.M{
+		"_id": company.ID,
+	}
+	
+	companyUpdate := bson.M{}
+	if company.CompanyName != "" {
+		companyUpdate["company_name"] = company.CompanyName
+	}
+	
+	if company.TelephoneNumber != "" {
+		companyUpdate["telephone_number"] = company.TelephoneNumber
+	}
+	
+	if company.IsActive || !company.IsActive {
+		companyUpdate["is_active"] = company.IsActive
+	}
+	
+	if company.Address != "" {
+		companyUpdate["address"] = company.Address
+	}
+	
+	update := bson.M{
+		"$set": companyUpdate,
+	}
+	
+	if _, err := repository.Client.
+		Database(config.Constant.DBName).
+		Collection("companies").
+		UpdateOne(ctx, filter, update);
+		err != nil {
+		return domain.Company{}, err
+	}
+	
 	return company, nil
 }

@@ -55,6 +55,55 @@ func (useCase CompanyUseCaseImpl) Create(payload web.CompanyCreateRequest) (web.
 	return helper.ToCompanyCreateResponse(company), nil
 }
 
+func (useCase CompanyUseCaseImpl) Update(payload web.CompanyUpdateRequest) (web.CompanyUpdateResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	
+	objectID, err := primitive.ObjectIDFromHex(payload.ID)
+	if err != nil {
+		return web.CompanyUpdateResponse{}, echo.NewHTTPError(http.StatusUnprocessableEntity, "Data is not found")
+	}
+	
+	company := domain.Company{
+		ID: objectID,
+	}
+	
+	if payload.CompanyName != nil {
+		company.CompanyName = *payload.CompanyName
+	}
+	
+	if payload.TelephoneNumber != nil {
+		company.TelephoneNumber = *payload.TelephoneNumber
+	}
+	
+	if payload.IsActive != nil {
+		company.IsActive = *payload.IsActive
+	}
+	
+	if payload.Address != nil {
+		company.Address = *payload.Address
+	}
+	
+	existedCompany, err := useCase.CompanyRepository.FindOne(ctx, company)
+	if err != nil {
+		if err == echo.ErrNotFound {
+			return web.CompanyUpdateResponse{}, echo.NewHTTPError(http.StatusUnprocessableEntity, "Data is not found")
+		}
+		return web.CompanyUpdateResponse{}, err
+	}
+	
+	if existedCompany.IsActive {
+		return web.CompanyUpdateResponse{}, echo.NewHTTPError(http.StatusBadRequest, "Company is already active")
+	}
+	
+	company, err = useCase.CompanyRepository.Update(ctx, company)
+	if err != nil {
+		return web.CompanyUpdateResponse{}, err
+	}
+	
+	return helper.ToCompanyUpdateResponse(company), nil
+}
+
 func (useCase CompanyUseCaseImpl) FindAll() ([]web.CompanyResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

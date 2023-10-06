@@ -10,4 +10,5 @@ func NewCompanyRouter(group *echo.Group, companyHandler handler.CompanyHandler, 
 	
 	company.POST("", companyHandler.Create, middlewares...)
 	company.GET("", companyHandler.FindAll)
+	company.PUT("/:id/set_active", companyHandler.SetActive, middlewares...)
 }
