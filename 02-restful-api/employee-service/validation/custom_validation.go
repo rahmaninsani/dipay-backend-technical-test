@@ -18,7 +18,6 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 			var errorMessage string
 			fieldName := e.Field()
 			
-			// Dapatkan tag JSON dari nama bidang jika ada
 			field, found := reflect.TypeOf(i).FieldByName(fieldName)
 			if found {
 				jsonTag := field.Tag.Get("json")
@@ -34,6 +33,23 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 				errorMessage = fmt.Sprintf("%s should be less than or equal to %s", fieldName, e.Param())
 			case "min":
 				errorMessage = fmt.Sprintf("%s should be greater than or equal to %s", fieldName, e.Param())
+			case "email":
+				errorMessage = fmt.Sprintf("%s should be a valid email", fieldName)
+			case "oneof":
+				value := reflect.ValueOf(i).FieldByName(e.Field()).Interface()
+				allowedValues := strings.Split(e.Param(), " ")
+				
+				valid := false
+				for _, v := range allowedValues {
+					if value == v {
+						valid = true
+						break
+					}
+				}
+				
+				if !valid {
+					errorMessage = fmt.Sprintf("%s is not one of the allowed values: %s", fieldName, allowedValues)
+				}
 			default:
 				errorMessage = fmt.Sprintf("%s is %s", fieldName, e.Tag())
 			}

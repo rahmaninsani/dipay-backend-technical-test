@@ -53,3 +53,10 @@ func ToCompanyUpdateResponse(company domain.Company) web.CompanyUpdateResponse {
 		IsActive: company.IsActive,
 	}
 }
+
+func ToEmployeeCreateResponse(employee domain.Employee, company domain.Company) web.EmployeeCreateResponse {
+	return web.EmployeeCreateResponse{
+		ID:        employee.ID.Hex(),
+		CompanyID: company.ID.Hex(),
+	}
+}

@@ -48,18 +48,21 @@ func main() {
 	
 	adminRepository := repository.NewAdminRepository(client)
 	companyRepository := repository.NewCompanyRepository(client)
+	employeeRepository := repository.NewEmployeeRepository(client)
 	
 	adminUseCase := usecase.NewAdminUseCase(adminRepository)
 	companyUseCase := usecase.NewCompanyUseCase(companyRepository)
+	employeeUseCase := usecase.NewEmployeeUseCase(employeeRepository, companyRepository)
 	
 	adminHandler := handler.NewAdminHandler(adminUseCase)
 	companyHandler := handler.NewCompanyHandler(companyUseCase)
+	employeeHandler := handler.NewEmployeeHandler(employeeUseCase)
 	
 	authMiddleware := customMiddleware.AuthMiddleware(adminRepository)
 	
 	api := e.Group("/api")
 	router.NewAdminRouter(api, adminHandler, nil)
-	router.NewCompanyRouter(api, companyHandler, []echo.MiddlewareFunc{authMiddleware})
+	router.NewCompanyRouter(api, companyHandler, employeeHandler, []echo.MiddlewareFunc{authMiddleware})
 	
 	address := fmt.Sprintf(":%s", config.Constant.AppPort)
 	e.Logger.Fatal(e.Start(address))
